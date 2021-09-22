@@ -1,0 +1,29 @@
+FROM golang:1.16.2-alpine3.13 as resource-builder
+ARG concourse_pipeline_resource_version
+
+RUN apk add git
+RUN git clone --depth 1 --branch ${concourse_pipeline_resource_version} https://github.com/concourse/concourse-pipeline-resource.git /src/concourse-pipeline-resource
+WORKDIR /src/concourse-pipeline-resource
+ENV CGO_ENABLED 0
+RUN go get -d ./...
+RUN go build -o /assets/in ./cmd/in
+RUN go build -o /assets/out ./cmd/out
+RUN go build -o /assets/check ./cmd/check
+
+
+FROM golang:1.16.2-alpine3.13 as fly-builder
+ARG concourse_version
+
+RUN apk add git
+RUN git clone --depth 1 --branch ${concourse_version} https://github.com/concourse/concourse /src/concourse
+WORKDIR /src/concourse
+ENV GO111MODULE=on
+RUN go build -v -ldflags "-extldflags '-static'" -o /assets/fly ./fly
+
+FROM alpine:edge AS resource
+RUN apk add --no-cache bash tzdata ca-certificates git jq openssh
+COPY --from=resource-builder assets/ /opt/resource/
+COPY --from=fly-builder assets/fly /opt/resource/
+RUN chmod +x /opt/resource/*
+
+FROM resource
