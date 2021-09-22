@@ -10,7 +10,7 @@ Builds both web and worker `arm64` components for Concourse CI - a prebuilt Dock
 
 ## Build & publish
 
-You will find under the `./build-specs` directory the configurations for building a certain version of Concourse CI.
+You will find under the `./build-specs` directory the available configurations for building Concourse CI for `arm64`.
 
 ~~~bash
 # Kick off the build - specify the concourse version you want to build
