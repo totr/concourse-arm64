@@ -98,23 +98,6 @@ docker rm -v git-resource
 generateResourceMetdata git $GIT_RESOURCE_VERSION false
 
 #
-# Build resource type: concourse-pipeline
-docker buildx build \
-  --build-arg concourse_pipeline_resource_version=$CONCOURSE_PIPELINE_RESOURCE_VERSION \
-  --build-arg concourse_version=$CONCOURSE_VERSION \
-  --platform linux/arm64 \
-  --tag $DOCKER_REGISTRY_BASE/concourse-pipeline-resource:$CONCOURSE_PIPELINE_RESOURCE_VERSION \
-  --push . \
-  -f resource-types/Dockerfile-concourse-pipeline-resource
-
-docker create --name concourse-pipeline-resource $DOCKER_REGISTRY_BASE/concourse-pipeline-resource:$CONCOURSE_PIPELINE_RESOURCE_VERSION
-mkdir -p resource-types/concourse-pipeline
-docker export concourse-pipeline-resource | gzip \
-  > resource-types/concourse-pipeline/rootfs.tgz
-docker rm -v concourse-pipeline-resource
-generateResourceMetdata concourse-pipeline $CONCOURSE_PIPELINE_RESOURCE_VERSION false
-
-#
 # Concourse image build
 docker buildx build \
   --build-arg concourse_version=$CONCOURSE_VERSION \

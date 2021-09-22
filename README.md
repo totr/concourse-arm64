@@ -19,7 +19,6 @@ You will find under the `./build-specs` directory the available configurations f
 
 The generated Docker image will be pushed to the specified repository defined in ther `.env` file and will include the following embedded Concourse resources:
 
-* [concourse-pipeline](https://github.com/concourse/concourse-pipeline-resource)
 * [git](https://github.com/concourse/git-resource)
 * [registry-image](https://github.com/concourse/registry-image-resource)
 * [semver](https://github.com/concourse/semver-resource)
