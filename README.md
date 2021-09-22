@@ -1,39 +1,63 @@
 # Concourse CI for linux/arm64
 
-```
-./build.sh
-```
+Builds both web and worker `arm64` components for Concourse CI - a prebuilt Docker image can be found on Docker Hub under [rdclda/concourse](https://hub.docker.com/repository/docker/rdclda/concourse).
 
-Will build the docker registry-image resource, zip it and put it in the
-right path. Will then build the main docker file which builds concourse
-first and then uses the binaries in a fresh docker image.
+## Prerequisites
 
-While this does not cross-compile, it can be run on arm machines with docker.
+* Docker daemon + Docker CLI (buildx enabled)
+* 2Gb of (Docker assigned) memory
+* Bash shell
+
+## Build & publish
+
+You will find under the `./build-specs` directory the configurations for building a certain version of Concourse CI.
+
+~~~bash
+# Kick off the build - specify the concourse version you want to build
+./build.sh v7.1.0
+~~~
+
+The generated Docker image will be pushed to the specified repository defined in ther `.env` file and will include the following embedded Concourse resources:
+
+* [concourse-pipeline](https://github.com/concourse/concourse-pipeline-resource)
+* [git](https://github.com/concourse/git-resource)
+* [registry-image](https://github.com/concourse/registry-image-resource)
+* [semver](https://github.com/concourse/semver-resource)
+* [time](https://github.com/concourse/time-resource)
 
 ## Build elm
 
-Version xxx is packaged within this repository, 
+Elm is a build dependency for the Concourse web component, but is not available for `arm64` - therefore elm `v0.19.1` has been pre-compiled on `arm64` and packaged under `./dist` within this repository.
+
+The two main reasons to not make the elm native binary compilation part of the Concourse CI build are:
+
+* Docker `buildx` fails (crashes) when trying to compile this on `amd64` platform
+* Takes too long
+
+In case you want to build elm yourself, follow the steps below:
 
 ~~~bash
-# FROM debian:buster-slim AS elm-arm64
+# Based upon Ubuntu 20.04
+# Raspberry Pi 4 with 8Gb memory and SSD storage attached
+# Expect build to take up to 3+ hours
+apt-get update && apt-get install ghc cabal-install -y
+apt-get install git curl -y
 
-# RUN apt-get update && apt-get install ghc cabal-install -y
-# RUN apt-get install git curl -y
+git config --global user.email "info@rdc.pt" && \
+git config --global user.name "Robin Daniel Consultants, Lda."
 
-# RUN git config --global user.email "info@rdc.pt" && \
-#       git config --global user.name "Robin Daniel Consultants, Lda."
+mkdir -p /tmp/build && cd /tmp/build
+git clone https://github.com/dmy/elm-raspberry-pi.git ./elm-raspberry-pi
+cd ./elm-raspberry-pi && git checkout tags/20200611
 
-# WORKDIR /build/elm-raspberry-pi
-# ARG elm_raspberry_pi_version=20200611
-# RUN git clone https://github.com/dmy/elm-raspberry-pi.git /build/elm-raspberry-pi
-# RUN git checkout tags/${elm_raspberry_pi_version}
+cd /tmp/build
+git clone https://github.com/elm/compiler.git ./elm/compiler
+cd ./elm/compiler && git checkout tags/0.19.1
 
-# WORKDIR /build/elm/compiler
-# ARG elm_compiler_version=0.19.1
-# RUN git clone https://github.com/elm/compiler.git /build/elm/compiler
-# RUN git checkout tags/${elm_compiler_version}
-# RUN git am -s /build/elm-raspberry-pi/patches/elm-${elm_compiler_version}.patch
-# RUN cabal new-update
-# RUN cabal new-configure --ghc-option=-split-sections
-# RUN cabal new-build
+git am -s /tmp/build/elm-raspberry-pi/patches/elm-0.19.1.patch
+cabal new-update
+cabal new-configure --ghc-option=-split-sections
+cabal new-build
 ~~~
+
+After the last step, the build will output the elm binary path.

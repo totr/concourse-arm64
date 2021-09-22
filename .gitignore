@@ -1,2 +1,2 @@
 resource-types/*
-!resource-types/.gitkeep
+!resource-types/Dockerfile*

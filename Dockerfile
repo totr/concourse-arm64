@@ -21,7 +21,7 @@ RUN npm install --global yarn
 #
 # Install elm (pre-compiled for arm64) since there is no public version available
 ARG elm_version
-ADD elm-${elm_version}-arm64.tar.gz /usr/local/bin
+ADD dist/elm-${elm_version}-arm64.tar.gz /usr/local/bin
 
 #
 # Build concourse web

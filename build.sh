@@ -1,29 +1,20 @@
 #!/bin/bash
 
-set -x
+# set -x
 set -e
 
-# Private Docker registry settings
-DOCKER_REGISTRY_BASE=rdclda
+if [ -f ./build-specs/$1.cfg ]; then
+  source ./build-specs/$1.cfg
+else
+  echo "Provide a Concourse version as first argument."
+  echo
+  echo "Available configurations:"
+  ls -1 ./build-specs | sed 's/\.cfg//g'
+  echo
+  exit 1
+fi
 
-# Concourse resource types build settings
-REGISTRY_IMAGE_RESOURCE_VERSION=v1.4.1
-TIME_RESOURCE_VERSION=v1.6.2
-SEMVER_RESOURCE_VERSION=v1.3.4
-GIT_RESOURCE_VERSION=v1.14.4
-CONCOURSE_PIPELINE_RESOURCE_VERSION=v6.0.1
-
-# Concourse web build settings
-ELM_TARBALL_VERSION=v0.19.1
-NODE_VERSION=v14.17.6
-
-# Concourse worker build settings
-CONCOURSE_VERSION=v7.1.0
-CNI_PLUGINS_VERSION=v0.8.7
-GUARDIAN_COMMIT_ID=51480bc73a282c02f827dde4851cc12265774272
-
-# Concourse image build settings
-CONCOURSE_DOCKER_ENTRYPOINT_COMMIT_ID=486894e6d6f84aad112c14094bca18bec8c48154
+source .env
 
 generateResourceMetdata() {
 _type=$1
@@ -49,7 +40,7 @@ docker buildx build \
   --platform linux/arm64 \
   --tag $DOCKER_REGISTRY_BASE/concourse-registry-image-resource:$REGISTRY_IMAGE_RESOURCE_VERSION \
   --push . \
-  -f Dockerfile-registry-image-resource
+  -f resource-types/Dockerfile-registry-image-resource
 
 docker create --name registry-image-resource $DOCKER_REGISTRY_BASE/concourse-registry-image-resource:$REGISTRY_IMAGE_RESOURCE_VERSION
 mkdir -p resource-types/registry-image
@@ -65,7 +56,7 @@ docker buildx build \
   --platform linux/arm64 \
   --tag $DOCKER_REGISTRY_BASE/concourse-time-resource:$TIME_RESOURCE_VERSION \
   --push . \
-  -f Dockerfile-time-resource
+  -f resource-types/Dockerfile-time-resource
 
 docker create --name time-resource $DOCKER_REGISTRY_BASE/concourse-time-resource:$TIME_RESOURCE_VERSION
 mkdir -p resource-types/time
@@ -81,7 +72,7 @@ docker buildx build \
   --platform linux/arm64 \
   --tag $DOCKER_REGISTRY_BASE/concourse-semver-resource:$SEMVER_RESOURCE_VERSION \
   --push . \
-  -f Dockerfile-semver-resource
+  -f resource-types/Dockerfile-semver-resource
 
 docker create --name semver-resource $DOCKER_REGISTRY_BASE/concourse-semver-resource:$SEMVER_RESOURCE_VERSION
 mkdir -p resource-types/semver
@@ -97,7 +88,7 @@ docker buildx build \
   --platform linux/arm64 \
   --tag $DOCKER_REGISTRY_BASE/concourse-git-resource:$GIT_RESOURCE_VERSION \
   --push . \
-  -f Dockerfile-git-resource
+  -f resource-types/Dockerfile-git-resource
 
 docker create --name git-resource $DOCKER_REGISTRY_BASE/concourse-git-resource:$GIT_RESOURCE_VERSION
 mkdir -p resource-types/git
@@ -114,7 +105,7 @@ docker buildx build \
   --platform linux/arm64 \
   --tag $DOCKER_REGISTRY_BASE/concourse-pipeline-resource:$CONCOURSE_PIPELINE_RESOURCE_VERSION \
   --push . \
-  -f Dockerfile-concourse-pipeline-resource
+  -f resource-types/Dockerfile-concourse-pipeline-resource
 
 docker create --name concourse-pipeline-resource $DOCKER_REGISTRY_BASE/concourse-pipeline-resource:$CONCOURSE_PIPELINE_RESOURCE_VERSION
 mkdir -p resource-types/concourse-pipeline
