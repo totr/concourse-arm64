@@ -30,22 +30,34 @@ $ fly --target=my-rpi login \
     --password=test                                                        
 ~~~
 
-## Example pipelines
+## Tests
 
-These examples are provided mostly to verify and test the bundled resource types. 
+These tests are provided to verify the correct working of the bundled resource types. 
 
 ~~~bash
-# load pipeline definitions
-$ fly -t my-rpi set-pipeline -p hello-world -c example-pipelines/hello-world.yaml
+# create a public s3 bucket
+$ aws s3api create-bucket --acl public-read \
+   --bucket rdclda-concourse-s3-test --region us-east-1
 
-# pipelines are paused when first created
-$ fly -t my-rpi unpause-pipeline -p hello-world
+# push test file to s3 bucket
+$ echo "Looks like the s3 resource is working." | \
+   aws s3 cp - s3://rdclda-concourse-s3-test/testfile.txt \
+   --acl public-read
 
-# trigger the job and watch it run to completion
-$ fly -t my-rpi trigger-job --job hello-world/hello-world-job --watch
+# deploy & kick off the tests
+$ for resource in registry-image time git s3; do
+    fly -t my-rpi set-pipeline -n -p test-${resource}-resource -c tests/$resource-resource.yaml
+    fly -t my-rpi unpause-pipeline -p test-${resource}-resource
+    fly -t my-rpi trigger-job --job test-${resource}-resource/test-job
+done
+
+# deploy Docker Compose in Docker test
+$ fly -t my-rpi set-pipeline -n -p test-dcind -c tests/dcind.yaml && \
+    fly -t my-rpi unpause-pipeline -p test-dcind
+    fly -t my-rpi trigger-job --job test-dcind/unit-tests  
 ~~~
 
-See the directory `./test-pipeline` for more examples.
+Use the web console to verify the output of the tests.
 
 ## BIY
 
