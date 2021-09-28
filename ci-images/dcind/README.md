@@ -27,49 +27,44 @@ Note that `docker-lib.sh` has `bash` dependencies, so it is important to use `ba
 ~~~yaml
   - name: integration
     plan:
-      - aggregate:
-        - get: code
-          params: {depth: 1}
-          passed: [unit-tests]
-          trigger: true
-        - get: redis
-          params: {save: true}
-        - get: busybox
-          params: {save: true}
-      - task: Run integration tests
+      - get: code
+        params: {depth: 1}
+        passed: [unit-tests]
+        trigger: true
+      - get: redis
+        params: {format: oci}
+      - get: busybox
+        params: {format: oci}
+      - task: run-integration-tests
         privileged: true
         config:
           platform: linux
           image_resource:
-            type: docker-image
+            type: registry-image
             source:
               repository: rdclda/concourse-dcind
           inputs:
             - name: code
             - name: redis
-            - name: busybox
           run:
             path: bash
             args:
-              - -exc
+              - -ec
               - |
                 source /docker-lib.sh
                 start_docker
-
+                
                 # Strictly speaking, preloading of Docker images is not required.
                 # However, you might want to do this for a couple of reasons:
                 # - If the image comes from a private repository, it is much easier to let Concourse pull it,
                 #   and then pass it through to the task.
                 # - When the image is passed to the task, Concourse can often get the image from its cache.
-                docker load -i redis/image
-                docker tag "$(cat redis/image-id)" "$(cat redis/repository):$(cat redis/tag)"
-
-                docker load -i busybox/image
-                docker tag "$(cat busybox/image-id)" "$(cat busybox/repository):$(cat busybox/tag)"
-
-                # This is just to visually check in the log that images have been loaded successfully
+                docker load -i redis/image.tar
+                # docker load -i busybox/image.tar
+                
+                # This is just to visually check in the log that images have been loaded successfully.
                 docker images
-
+                
                 # Run the container with tests and its dependencies.
                 docker-compose -f code/ci-images/dcind/example/integration.yaml run tests
 ~~~
