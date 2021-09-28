@@ -24,7 +24,7 @@ Copy the example [docker-compose.yaml](./docker-compose.yaml) to your Raspberry 
 $ sudo docker-compose up -d
 
 # Login using fly - update your IP here too ;-)
-$ fly --target=pi login \
+$ fly --target=my-rpi login \
     --concourse-url=http://10.0.19.18:8080 \
     --username=test \
     --password=test                                                        
@@ -35,8 +35,17 @@ $ fly --target=pi login \
 These examples are provided mostly to verify and test the bundled resource types. 
 
 ~~~bash
-# TODO
+# load pipeline definitions
+$ fly -t my-rpi set-pipeline -p hello-world -c example-pipelines/hello-world.yaml
+
+# pipelines are paused when first created
+$ fly -t my-rpi unpause-pipeline -p hello-world
+
+# trigger the job and watch it run to completion
+$ fly -t my-rpi trigger-job --job hello-world/hello-world-job --watch
 ~~~
+
+See the directory `./test-pipeline` for more examples.
 
 ## BIY
 
