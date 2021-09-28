@@ -10,4 +10,4 @@ services:
     container_name: mytests
     depends_on:
       - myredis
-    command: "redis-cli -h myredis -p 6390 ping"
+    command: "redis-cli -h myredis ping"
