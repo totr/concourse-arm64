@@ -70,6 +70,7 @@ RUN ./build_linux.sh
 # Generate the final image
 FROM ubuntu:bionic AS ubuntu
 
+ARG concourse_version
 ARG concourse_docker_entrypoint_commit_id
 
 COPY --from=yarn-builder /yarn/concourse/web/public/ /public
@@ -98,7 +99,17 @@ RUN apt-get update && apt-get install -y \
     iptables \
     dumb-init \
     iproute2 \
-    file
+    file \
+    curl
+
+# Add fly CLI versions
+RUN mkdir -p /usr/local/concourse/fly-assets && \
+      curl -sL https://github.com/concourse/concourse/releases/download/v${concourse_version}/fly-${concourse_version}-darwin-amd64.tgz \
+         -o /usr/local/concourse/fly-assets/fly-darwin-amd64.tgz && \
+      curl -sL https://github.com/concourse/concourse/releases/download/v${concourse_version}/fly-${concourse_version}-linux-amd64.tgz \
+         -o /usr/local/concourse/fly-assets/fly-linux-amd64.tgz && \
+      curl -sL https://github.com/concourse/concourse/releases/download/v${concourse_version}/fly-${concourse_version}-windows-amd64.zip \
+         -o /usr/local/concourse/fly-assets/fly-windows-amd64.zip
 
 STOPSIGNAL SIGUSR2
 
