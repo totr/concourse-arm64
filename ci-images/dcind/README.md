@@ -60,7 +60,6 @@ Note that `docker-lib.sh` has `bash` dependencies, so it is important to use `ba
                 #   and then pass it through to the task.
                 # - When the image is passed to the task, Concourse can often get the image from its cache.
                 docker load -i redis/image.tar
-                # docker load -i busybox/image.tar
                 
                 # This is just to visually check in the log that images have been loaded successfully.
                 docker images
