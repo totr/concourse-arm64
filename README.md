@@ -38,7 +38,7 @@ These examples are provided mostly to verify and test the bundled resource types
 # TODO
 ~~~
 
-## DIY
+## BIY
 
 Follow the steps below if you want to build the images yourself.
 ### Prerequisites
