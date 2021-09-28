@@ -82,5 +82,4 @@ jobs:
                 docker images
                 
                 # Run the container with tests and its dependencies.
-                cat code/ci-images/dcind/example/integration.yaml
                 docker-compose -f code/ci-images/dcind/example/integration.yaml run tests
