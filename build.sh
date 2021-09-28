@@ -3,13 +3,13 @@
 # set -x
 set -e
 
-if [ -f ./build-specs/$1.cfg ]; then
-  source ./build-specs/$1.cfg
+if [ -f ./build-specs/concourse-$1.cfg ]; then
+  source ./build-specs/concourse-$1.cfg
 else
   echo "Provide a Concourse version as first argument."
   echo
   echo "Available configurations:"
-  ls -1 ./build-specs | sed 's/\.cfg//g'
+  ls -1 ./build-specs | sed 's/concourse-//g' | sed 's/\.cfg//g'
   echo
   exit 1
 fi
@@ -33,69 +33,38 @@ cat << EOF > resource-types/$_type/resource_metadata.json
 EOF
 }
 
-#
-# Build resource type: registry image
-docker buildx build \
-  --build-arg registry_image_resource_version=$REGISTRY_IMAGE_RESOURCE_VERSION \
-  --platform linux/arm64 \
-  --tag $DOCKER_REGISTRY_BASE/concourse-registry-image-resource:$REGISTRY_IMAGE_RESOURCE_VERSION \
-  --push . \
-  -f resource-types/Dockerfile-registry-image-resource
+buildConcourseResourceDocker() {
+  _type=$1
+  _build_arg_type=$(echo $_type | sed 's/-/_/g')
+  _version=$2
+  _privileged=$3
 
-docker create --name registry-image-resource $DOCKER_REGISTRY_BASE/concourse-registry-image-resource:$REGISTRY_IMAGE_RESOURCE_VERSION
-mkdir -p resource-types/registry-image
-docker export registry-image-resource | gzip \
-  > resource-types/registry-image/rootfs.tgz
-docker rm -v registry-image-resource
-generateResourceMetdata registry-image $REGISTRY_IMAGE_RESOURCE_VERSION false
+  docker buildx build \
+    --build-arg ${_build_arg_type}_resource_version=${_version} \
+    --platform linux/arm64 \
+    --tag $DOCKER_REGISTRY_BASE/concourse-${_type}-resource:${_version} \
+    --push . \
+    -f resource-types/Dockerfile-${_type}-resource
 
-#
-# Build resource type: time
-docker buildx build \
-  --build-arg time_resource_version=$TIME_RESOURCE_VERSION \
-  --platform linux/arm64 \
-  --tag $DOCKER_REGISTRY_BASE/concourse-time-resource:$TIME_RESOURCE_VERSION \
-  --push . \
-  -f resource-types/Dockerfile-time-resource
-
-docker create --name time-resource $DOCKER_REGISTRY_BASE/concourse-time-resource:$TIME_RESOURCE_VERSION
-mkdir -p resource-types/time
-docker export time-resource | gzip \
-  > resource-types/time/rootfs.tgz
-docker rm -v time-resource
-generateResourceMetdata time $TIME_RESOURCE_VERSION false
+  docker create --name ${_type}-resource $DOCKER_REGISTRY_BASE/concourse-${_type}-resource:${_version}
+  mkdir -p resource-types/${_type}
+  docker export ${_type}-resource | gzip \
+    > resource-types/${_type}/rootfs.tgz
+  docker rm -v ${_type}-resource
+  generateResourceMetdata ${_type} ${_version} ${_privileged} 
+}
 
 #
-# Build resource type: semver
-docker buildx build \
-  --build-arg semver_resource_version=$SEMVER_RESOURCE_VERSION \
-  --platform linux/arm64 \
-  --tag $DOCKER_REGISTRY_BASE/concourse-semver-resource:$SEMVER_RESOURCE_VERSION \
-  --push . \
-  -f resource-types/Dockerfile-semver-resource
+# Build resource types
+buildConcourseResourceDocker registry-image $REGISTRY_IMAGE_RESOURCE_VERSION false
+buildConcourseResourceDocker time $TIME_RESOURCE_VERSION false
+buildConcourseResourceDocker semver $SEMVER_RESOURCE_VERSION false
+buildConcourseResourceDocker git $GIT_RESOURCE_VERSION false
+buildConcourseResourceDocker mock $MOCK_RESOURCE_VERSION false
+buildConcourseResourceDocker s3 $S3_RESOURCE_VERSION false
+buildConcourseResourceDocker github-release $GITHUB_RELEASE_RESOURCE_VERSION false
+buildConcourseResourceDocker slack-alert $SLACK_ALERT_RESOURCE_VERSION false
 
-docker create --name semver-resource $DOCKER_REGISTRY_BASE/concourse-semver-resource:$SEMVER_RESOURCE_VERSION
-mkdir -p resource-types/semver
-docker export semver-resource | gzip \
-  > resource-types/semver/rootfs.tgz
-docker rm -v semver-resource
-generateResourceMetdata semver $SEMVER_RESOURCE_VERSION false
-
-#
-# Build resource type: git
-docker buildx build \
-  --build-arg git_resource_version=$GIT_RESOURCE_VERSION \
-  --platform linux/arm64 \
-  --tag $DOCKER_REGISTRY_BASE/concourse-git-resource:$GIT_RESOURCE_VERSION \
-  --push . \
-  -f resource-types/Dockerfile-git-resource
-
-docker create --name git-resource $DOCKER_REGISTRY_BASE/concourse-git-resource:$GIT_RESOURCE_VERSION
-mkdir -p resource-types/git
-docker export git-resource | gzip \
-  > resource-types/git/rootfs.tgz
-docker rm -v git-resource
-generateResourceMetdata git $GIT_RESOURCE_VERSION false
 
 #
 # Concourse image build

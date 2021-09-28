@@ -1,30 +1,54 @@
 # Concourse CI for linux/arm64
 
-Builds both web and worker `arm64` components for Concourse CI - a prebuilt Docker image can be found on Docker Hub under [rdclda/concourse](https://hub.docker.com/repository/docker/rdclda/concourse).
+This repository helps you build both the web and worker `arm64` components for Concourse CI - prebuilt Docker images can be found on Docker Hub [rdclda/concourse](https://hub.docker.com/repository/docker/rdclda/concourse).
 
-## Prerequisites
+## Bundled resources
 
-* Docker daemon + Docker CLI (buildx enabled)
-* 2Gb of (Docker assigned) memory
-* Bash shell
+| Concourse | [git](https://github.com/concourse/git-resource) | [github-release](https://github.com/concourse/github-release-resource) | [registry-image](https://github.com/concourse/registry-image-resource) | [semver](https://github.com/concourse/semver-resource) | [time](https://github.com/concourse/time-resource) | [mock](https://github.com/concourse/mock-resource) | [s3](https://github.com/concourse/s3-resource) | [slack-alert](https://github.com/arbourd/concourse-slack-alert-resource) |
+|--- |--- |--- |--- |--- |--- |--- |--- |--- |
+| v7.1.0 | v1.12.0 | v1.5.2 | v1.2.0 | v1.3.0 | v1.5.0 | v0.11.1 | v1.1.1 | v0.15.0 |
+| v7.2.0 | v1.12.1 | v1.5.2 | v1.2.1 | v1.3.0 | v1.6.0 | v0.11.1 | v1.1.1 | v0.15.0 |
+| v7.3.2 | v1.14.0 | v1.6.1 | v1.3.0 | v1.3.1 | v1.6.0 | v0.11.2 | v1.1.1 | v0.15.0 |
+| v7.4.0 | v1.14.0 | v1.6.4 | v1.4.0 | v1.3.4 | v1.6.1 | v0.12.2 | v1.1.2 | v0.15.0 |
+| v7.5.0 | v1.14.4 | v1.6.4 | v1.4.1 | v1.3.4 | v1.6.2 | v0.12.3 | v1.1.3 | v0.15.0 |
 
-## Build & publish
+## Bundled CLIs
 
-You will find under the `./build-specs` directory the available configurations for building Concourse CI for `arm64`.
+Each Docker image includes the CLIs for Linux/Mac/Windows for the Intel platform - they can be downloaded from the Concourse web console.
+## Deploy
+
+Copy the example [docker-compose.yaml](./docker-compose.yaml) to your Raspberry Pi and update the external IP address setting `CONCOURSE_EXTERNAL_URL`.
 
 ~~~bash
-# Kick off the build - specify the concourse version you want to build
-./build.sh v7.1.0
+# On your Raspberry Pi node
+$ sudo docker-compose up -d
+
+# Login using fly - update your IP here too ;-)
+$ fly --target=pi login \
+    --concourse-url=http://10.0.19.18:8080 \
+    --username=test \
+    --password=test                                                        
 ~~~
 
-The generated Docker image will be pushed to the specified repository defined in ther `.env` file and will include the following embedded Concourse resources:
+## Example pipelines
 
-* [git](https://github.com/concourse/git-resource)
-* [registry-image](https://github.com/concourse/registry-image-resource)
-* [semver](https://github.com/concourse/semver-resource)
-* [time](https://github.com/concourse/time-resource)
+These examples are provided mostly to verify and test the bundled resource types. 
 
-## Build elm
+~~~bash
+# TODO
+~~~
+
+## DIY
+
+Follow the steps below if you want to build the images yourself.
+### Prerequisites
+
+* Raspberry Pi 4 with 8Gb of memory (if you want to build `elm`)
+* Docker daemon + Docker CLI (buildx enabled)
+* 4Gb of (Docker assigned) memory
+* Bash shell
+
+### Build elm
 
 Elm is a build dependency for the Concourse web component, but is not available for `arm64` - therefore elm `v0.19.1` has been pre-compiled on `arm64` and packaged under `./dist` within this repository.
 
@@ -60,3 +84,14 @@ cabal new-build
 ~~~
 
 After the last step, the build will output the elm binary path.
+
+### Build Concourse
+
+You will find under the `./build-specs` directory the available configurations for building Concourse CI for `arm64`.
+
+~~~bash
+# Kick off the build - specify the concourse version you want to build
+./build.sh 7.1.0
+~~~
+
+The generated Docker image will be pushed to the specified repository defined in the `.env` file.

@@ -4,29 +4,29 @@ FROM ubuntu:20.04 AS yarn-builder
 
 RUN apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata
-RUN apt-get install -y git curl libatomic1 xz-utils jq
+RUN apt-get update && apt-get install -y git curl libatomic1 xz-utils jq chromium-bsu chromium-browser
 
 #
 # NodeJS installation
 ARG node_version
-RUN curl -sL https://nodejs.org/dist/${node_version}/node-${node_version}-linux-arm64.tar.xz -o node-${node_version}-linux-arm64.tar.xz && \
+RUN curl -sL https://nodejs.org/dist/v${node_version}/node-v${node_version}-linux-arm64.tar.xz -o node-${node_version}-linux-arm64.tar.xz && \
       mkdir -p /usr/local/lib/nodejs && \
       tar -xJf node-${node_version}-linux-arm64.tar.xz -C /usr/local/lib/nodejs && \
       rm -Rf node-${node_version}-linux-arm64.tar.xz
 
-ENV PATH="/usr/local/lib/nodejs/node-${node_version}-linux-arm64/bin:${PATH}"
+ENV PATH="/usr/local/lib/nodejs/node-v${node_version}-linux-arm64/bin:${PATH}"
 
 RUN npm install --global yarn
 
 #
 # Install elm (pre-compiled for arm64) since there is no public version available
 ARG elm_version
-ADD dist/elm-${elm_version}-arm64.tar.gz /usr/local/bin
+ADD dist/elm-v${elm_version}-arm64.tar.gz /usr/local/bin
 
 #
 # Build concourse web
 ARG concourse_version
-RUN git clone --branch ${concourse_version} https://github.com/concourse/concourse /yarn/concourse
+RUN git clone --branch v${concourse_version} https://github.com/concourse/concourse /yarn/concourse
 WORKDIR /yarn/concourse
 
 # Patch the package json since we have elm pre-installed
@@ -55,11 +55,11 @@ RUN go build -ldflags "-extldflags '-static'" -mod=vendor -o gdn ./cmd/gdn
 WORKDIR /go/guardian/cmd/init
 RUN gcc -static -o init init.c ignore_sigchild.c
 
-RUN git clone --branch ${concourse_version} https://github.com/concourse/concourse /go/concourse
+RUN git clone --branch v${concourse_version} https://github.com/concourse/concourse /go/concourse
 WORKDIR /go/concourse
-RUN go build -v -ldflags "-extldflags '-static'" ./cmd/concourse
+RUN go build -v -ldflags "-extldflags '-static' -X github.com/concourse/concourse.Version=${concourse_version}" ./cmd/concourse
 
-RUN git clone --branch ${cni_plugins_version} https://github.com/containernetworking/plugins.git /go/plugins
+RUN git clone --branch v${cni_plugins_version} https://github.com/containernetworking/plugins.git /go/plugins
 WORKDIR /go/plugins
 RUN apk add bash
 ENV CGO_ENABLED=0
