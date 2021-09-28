@@ -44,14 +44,14 @@ $ echo "Looks like the s3 resource is working." | \
    aws s3 cp - s3://rdclda-concourse-s3-test/testfile.txt \
    --acl public-read
 
-# deploy & kick off the tests
+# deploy & kick off the bundled resource tests
 $ for resource in registry-image time git s3; do
     fly -t my-rpi set-pipeline -n -p test-${resource}-resource -c tests/$resource-resource.yaml
     fly -t my-rpi unpause-pipeline -p test-${resource}-resource
     fly -t my-rpi trigger-job --job test-${resource}-resource/test-job
 done
 
-# deploy Docker Compose in Docker test
+# deploy & kick off the Docker Compose in Docker (dcind) test
 $ fly -t my-rpi set-pipeline -n -p test-dcind -c ci-images/dcind/example/pipe.yaml && \
     fly -t my-rpi unpause-pipeline -p test-dcind
     fly -t my-rpi trigger-job --job test-dcind/unit-tests  
