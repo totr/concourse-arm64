@@ -6,8 +6,8 @@ services:
     container_name: myredis
 
   tests:
-    image: arm64v8/busybox
+    image: arm64v8/redis:5-alpine
     container_name: mytests
     depends_on:
       - myredis
-    command: "echo 'Tests OK'"
+    command: "redis-cli -h myredis -p 6390 ping"
