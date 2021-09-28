@@ -2,7 +2,7 @@ version: "2"
 
 services:
   myredis:
-    image: arm64v8/redis
+    image: arm64v8/redis:5-alpine
     container_name: myredis
 
   tests:
