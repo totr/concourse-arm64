@@ -18,12 +18,14 @@ This repository helps you build both the web and worker `arm64` components for C
 
 Each Docker image includes the CLIs for Linux/Mac/Windows for the Intel platform - they can be downloaded from the Concourse web console.
 
-## Concourse tasks
+## Available Concourse tasks
 
-| External task | Version | Description |
-|--- |--- |--- |
-| [dcind](https://github.com/robinhuiser/concourse-arm64/tree/main/external-tasks/dcind) | v1.0.0 | A task for running Docker Compose in Docker | 
-| [oci-build](https://github.com/concourse/oci-build-task) | v0.9.0 | A task for building OCI images |
+The following tasks have been ported to the `arm64` platform:
+
+| Task | Image | Version | Description |
+|--- |--- |--- |---|
+| [dcind](https://github.com/robinhuiser/concourse-arm64/tree/main/external-tasks/dcind) | [rdclda/concourse-dcind-task](https://hub.docker.com/repository/docker/rdclda/concourse-dcind-task) | 1.0.0 | A task for running Docker Compose in Docker | 
+| [oci-build](https://github.com/concourse/oci-build-task) | [rdclda/concourse-oci-build-task](https://hub.docker.com/repository/docker/rdclda/concourse-oci-build-task) | 0.9.0 | A task for building OCI images |
 
 ## Deploy
 
