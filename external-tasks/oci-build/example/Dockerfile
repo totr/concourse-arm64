@@ -1,2 +1,2 @@
-FROM arm64v8/busybox
+FROM scratch
 COPY Dockerfile /

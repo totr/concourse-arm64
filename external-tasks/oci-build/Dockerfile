@@ -5,8 +5,9 @@ ARG oci_build_task_version
 RUN apk add git
 RUN git clone --depth 1 --branch v${oci_build_task_version} https://github.com/concourse/oci-build-task.git /src/oci-build-task
 WORKDIR /src/oci-build-task
+RUN git submodule update --init --recursive
+RUN --mount=type=cache,target=/root/.cache/go-build go get -d ./...
 ENV CGO_ENABLED 0
-RUN go get -d ./...
 RUN go build -o /assets/task ./cmd/task
 RUN go build -o /assets/build ./cmd/build
 

@@ -13,17 +13,21 @@ jobs:
   - get: concourse-arm64
     trigger: true
   - task: build-task
+    privileged: true
     config:
       platform: linux
-      type: registry-image
-      source:
-        repository: rdclda/concourse-oci-build-task
-        tag: latest
+      image_resource:
+        type: registry-image
+        source: 
+          repository: rdclda/concourse-oci-build-task
+          tag: latest
       inputs:
-      - name: context
-        path: concourse-arm64/external-tasks/oci-build/example
+      - name: concourse-arm64
       outputs:
       - name: image
-      caches:
+      params:
+        CONTEXT: concourse-arm64/external-tasks/oci-build/example
+      run:
+        path: build
+      caches: 
       - path: cache
-      run: {path: build}
