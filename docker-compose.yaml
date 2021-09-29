@@ -10,7 +10,7 @@ services:
       PGDATA: /database
 
   concourse:
-    image: rdclda/concourse:7.1.0
+    image: rdclda/concourse:7.5.0
     command: quickstart
     privileged: true
     depends_on: [concourse-db]
@@ -30,6 +30,6 @@ services:
       CONCOURSE_TSA_CLIENT_SECRET: Y29uY291cnNlLXdvcmtlcgo=
       CONCOURSE_X_FRAME_OPTIONS: allow
       CONCOURSE_CONTENT_SECURITY_POLICY: "*"
-      CONCOURSE_CLUSTER_NAME: tutorial
+      CONCOURSE_CLUSTER_NAME: arm64
       CONCOURSE_WORKER_CONTAINERD_DNS_SERVER: "8.8.8.8"
       CONCOURSE_WORKER_RUNTIME: "containerd"

@@ -2,6 +2,8 @@
 
 This repository helps you build both the web and worker `arm64` components for Concourse CI - prebuilt Docker images can be found on Docker Hub [rdclda/concourse](https://hub.docker.com/repository/docker/rdclda/concourse).
 
+![Concourse on arm64 screenshot](./screenshot.png)
+
 ## Bundled resources
 
 | Concourse | [git](https://github.com/concourse/git-resource) | [github-release](https://github.com/concourse/github-release-resource) | [registry-image](https://github.com/concourse/registry-image-resource) | [semver](https://github.com/concourse/semver-resource) | [time](https://github.com/concourse/time-resource) | [mock](https://github.com/concourse/mock-resource) | [s3](https://github.com/concourse/s3-resource) | [slack-alert](https://github.com/arbourd/concourse-slack-alert-resource) |
@@ -29,14 +31,16 @@ Copy the example [docker-compose.yaml](./docker-compose.yaml) to your Raspberry 
 
 ~~~bash
 # On your Raspberry Pi node
-$ sudo docker-compose up -d
+$ sudo docker-compose up
 
 # Login using fly - update your IP here too ;-)
 $ fly --target=my-rpi login \
     --concourse-url=http://10.0.19.18:8080 \
     --username=test \
-    --password=test                                                        
+    --password=test                                                      
 ~~~
+
+You can now access the Concourse web console using [http://10.0.19.18:8080/](http://10.0.19.18:8080/).
 
 ## Tests
 
@@ -72,7 +76,7 @@ $ for resource in registry-image time git s3 slack-alert; do
 done
 
 # deploy & kick off the external task test
-for task in dcind oci-build; do
+$ for task in dcind oci-build; do
     fly -t my-rpi set-pipeline -n -p test-${task}-task -c external-tasks/${task}/example/pipe.yaml
     fly -t my-rpi unpause-pipeline -p test-${task}-task
     fly -t my-rpi trigger-job --job test-${task}-task/test-job
