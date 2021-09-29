@@ -20,7 +20,7 @@ resources:
       repository: arm64v8/busybox
 
 jobs:
-  - name: unit-tests
+  - name: test-job
     plan:
     - get: code
       params: {depth: 1}
@@ -38,13 +38,13 @@ jobs:
           args:
             - -exc
             - |
-              ./code/build-tasks/dcind/example/unit-tests.sh
+              ./code/external-tasks/dcind/example/unit-tests.sh
 
   - name: integration
     plan:
       - get: code
         params: {depth: 1}
-        passed: [unit-tests]
+        passed: [test-job]
         trigger: true
       - get: redis
         params: {format: oci}
@@ -81,4 +81,4 @@ jobs:
                 docker images
                 
                 # Run the container with tests and its dependencies.
-                docker-compose -f code/build-tasks/dcind/example/integration.yaml run tests
+                docker-compose -f code/external-tasks/dcind/example/integration.yaml run tests

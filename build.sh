@@ -81,7 +81,7 @@ buildConcourseResourceDocker() {
 #
 # Concourse CI image: Docker-Compose in Docker
 for task in dcind; do
-  (cd ./build-tasks/$task && docker buildx build \
+  (cd ./external-tasks/$task && docker buildx build \
     --platform linux/arm64 \
     --tag $DOCKER_REGISTRY_BASE/concourse-$task-task:latest \
     --tag $DOCKER_REGISTRY_BASE/concourse-$task-task:1.0.0 \

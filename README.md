@@ -15,6 +15,14 @@ This repository helps you build both the web and worker `arm64` components for C
 ## Bundled CLIs
 
 Each Docker image includes the CLIs for Linux/Mac/Windows for the Intel platform - they can be downloaded from the Concourse web console.
+
+## Concourse tasks
+
+| External task | Version | Description |
+|--- |--- |--- |
+| [dcind](https://github.com/robinhuiser/concourse-arm64/tree/main/external-tasks/dcind) | v1.0.0 | A task for running Docker Compose in Docker | 
+| [oci-build](https://github.com/concourse/oci-build-task) | v0.9.0 | A task for building OCI images |
+
 ## Deploy
 
 Copy the example [docker-compose.yaml](./docker-compose.yaml) to your Raspberry Pi and update the external IP address setting `CONCOURSE_EXTERNAL_URL`.
@@ -51,10 +59,12 @@ $ for resource in registry-image time git s3; do
     fly -t my-rpi trigger-job --job test-${resource}-resource/test-job
 done
 
-# deploy & kick off the Docker Compose in Docker (dcind) test
-$ fly -t my-rpi set-pipeline -n -p test-dcind -c build-tasks/dcind/example/pipe.yaml && \
-    fly -t my-rpi unpause-pipeline -p test-dcind
-    fly -t my-rpi trigger-job --job test-dcind/unit-tests  
+# deploy & kick off the external task test
+for task in dcind; do
+    fly -t my-rpi set-pipeline -n -p test-${task}-task -c external-tasks/${task}/example/pipe.yaml && \
+    fly -t my-rpi unpause-pipeline -p test-${task}-task
+    fly -t my-rpi trigger-job --job test-${task}-task/test-job
+done
 ~~~
 
 Use the web console to verify the output of the tests.

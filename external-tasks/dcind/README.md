@@ -65,5 +65,5 @@ Note that `docker-lib.sh` has `bash` dependencies, so it is important to use `ba
                 docker images
                 
                 # Run the container with tests and its dependencies.
-                docker-compose -f code/build-tasks/dcind/example/integration.yaml run tests
+                docker-compose -f code/external-tasks/dcind/example/integration.yaml run tests
 ~~~
