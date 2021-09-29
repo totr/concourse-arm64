@@ -54,36 +54,40 @@ buildConcourseResourceDocker() {
   generateResourceMetdata ${_type} ${_version} ${_privileged} 
 }
 
-# #
-# # Build resource types
-# buildConcourseResourceDocker registry-image $REGISTRY_IMAGE_RESOURCE_VERSION false
-# buildConcourseResourceDocker time $TIME_RESOURCE_VERSION false
-# buildConcourseResourceDocker semver $SEMVER_RESOURCE_VERSION false
-# buildConcourseResourceDocker git $GIT_RESOURCE_VERSION false
-# buildConcourseResourceDocker mock $MOCK_RESOURCE_VERSION false
-# buildConcourseResourceDocker s3 $S3_RESOURCE_VERSION false
-# buildConcourseResourceDocker github-release $GITHUB_RELEASE_RESOURCE_VERSION false
-# buildConcourseResourceDocker slack-alert $SLACK_ALERT_RESOURCE_VERSION false
-
-# #
-# # Concourse image build
-# docker buildx build \
-#   --build-arg concourse_version=$CONCOURSE_VERSION \
-#   --build-arg cni_plugins_version=$CNI_PLUGINS_VERSION \
-#   --build-arg guardian_commit_id=$GUARDIAN_COMMIT_ID \
-#   --build-arg concourse_docker_entrypoint_commit_id=$CONCOURSE_DOCKER_ENTRYPOINT_COMMIT_ID \
-#   --build-arg elm_version=$ELM_TARBALL_VERSION \
-#   --build-arg node_version=$NODE_VERSION \
-#   --platform linux/arm64 \
-#   --tag $DOCKER_REGISTRY_BASE/concourse:$CONCOURSE_VERSION \
-#   --push .
+#
+# Build resource types
+buildConcourseResourceDocker registry-image $REGISTRY_IMAGE_RESOURCE_VERSION false
+buildConcourseResourceDocker time $TIME_RESOURCE_VERSION false
+buildConcourseResourceDocker semver $SEMVER_RESOURCE_VERSION false
+buildConcourseResourceDocker git $GIT_RESOURCE_VERSION false
+buildConcourseResourceDocker mock $MOCK_RESOURCE_VERSION false
+buildConcourseResourceDocker s3 $S3_RESOURCE_VERSION false
+buildConcourseResourceDocker github-release $GITHUB_RELEASE_RESOURCE_VERSION false
+buildConcourseResourceDocker slack-alert $SLACK_ALERT_RESOURCE_VERSION false
 
 #
-# Concourse CI image: Docker-Compose in Docker
-for task in dcind; do
-  (cd ./external-tasks/$task && docker buildx build \
+# Concourse image build
+docker buildx build \
+  --build-arg concourse_version=$CONCOURSE_VERSION \
+  --build-arg cni_plugins_version=$CNI_PLUGINS_VERSION \
+  --build-arg guardian_commit_id=$GUARDIAN_COMMIT_ID \
+  --build-arg concourse_docker_entrypoint_commit_id=$CONCOURSE_DOCKER_ENTRYPOINT_COMMIT_ID \
+  --build-arg elm_version=$ELM_TARBALL_VERSION \
+  --build-arg node_version=$NODE_VERSION \
+  --platform linux/arm64 \
+  --tag $DOCKER_REGISTRY_BASE/concourse:$CONCOURSE_VERSION \
+  --push .
+
+#
+# Build external tasks
+for task in dcind:1.0.0 oci-build:0.9.0; do
+  _t=$(echo $task | awk -F: '{print $1}')
+  _v=$(echo $task | awk -F: '{print $2}')
+  _b=$(echo $_t | sed 's/-/_/g')
+  (cd ./external-tasks/$_t && docker buildx build \
     --platform linux/arm64 \
-    --tag $DOCKER_REGISTRY_BASE/concourse-$task-task:latest \
-    --tag $DOCKER_REGISTRY_BASE/concourse-$task-task:1.0.0 \
+    --build-arg ${_b}_task_version=${_v} \
+    --tag $DOCKER_REGISTRY_BASE/concourse-${_t}-task:latest \
+    --tag $DOCKER_REGISTRY_BASE/concourse-${_t}-task:${_v} \
     --push .)
 done

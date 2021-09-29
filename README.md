@@ -60,7 +60,7 @@ $ for resource in registry-image time git s3; do
 done
 
 # deploy & kick off the external task test
-for task in dcind; do
+for task in dcind oci-build; do
     fly -t my-rpi set-pipeline -n -p test-${task}-task -c external-tasks/${task}/example/pipe.yaml && \
     fly -t my-rpi unpause-pipeline -p test-${task}-task
     fly -t my-rpi trigger-job --job test-${task}-task/test-job
