@@ -1,0 +1,16 @@
+---
+resources:
+- name: notify
+  type: slack-alert
+  icon: slack
+  source:
+    url: ((slack-webhook-url))
+
+jobs:
+- name: test-job
+  public: true
+  plan:
+  - put: notify
+    params:
+      message: Looks like the slack-alert resource is working.
+      color: "#eeeeee"

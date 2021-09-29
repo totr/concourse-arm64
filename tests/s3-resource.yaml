@@ -4,7 +4,7 @@ resources:
   type: s3
   icon: aws
   source:
-    bucket: rdclda-concourse-s3-test
+    bucket: ((s3-bucket-name))
     regexp: test(.*).txt
 
 jobs:

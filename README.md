@@ -42,32 +42,44 @@ $ fly --target=my-rpi login \
 
 These tests are provided to verify the correct working of the bundled resource types. 
 
+Prepare some surrounding service requirements first:
+
 ~~~bash
 # create a public s3 bucket
+$ export S3_BUCKET_NAME=rdclda-concourse-s3-test
 $ aws s3api create-bucket --acl public-read \
-   --bucket rdclda-concourse-s3-test --region us-east-1
+   --bucket $S3_BUCKET_NAME --region us-east-1
 
 # push test file to s3 bucket
 $ echo "Looks like the s3 resource is working." | \
-   aws s3 cp - s3://rdclda-concourse-s3-test/testfile.txt \
+   aws s3 cp - s3://$S3_BUCKET_NAME/testfile.txt \
    --acl public-read
 
+# define your Slack webhook URL
+$ export SLACK_WEBHOOK_URL=https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX
+~~~
+
+Now, we can deploy and run the tests:
+
+~~~bash
 # deploy & kick off the bundled resource tests
-$ for resource in registry-image time git s3; do
-    fly -t my-rpi set-pipeline -n -p test-${resource}-resource -c tests/$resource-resource.yaml
+$ for resource in registry-image time git s3 slack-alert; do
+    fly -t my-rpi set-pipeline -n -p test-${resource}-resource -c tests/$resource-resource.yaml \
+      --var s3-bucket-name=$S3_BUCKET_NAME \
+      --var slack-webhook-url=$SLACK_WEBHOOK_URL
     fly -t my-rpi unpause-pipeline -p test-${resource}-resource
     fly -t my-rpi trigger-job --job test-${resource}-resource/test-job
 done
 
 # deploy & kick off the external task test
 for task in dcind oci-build; do
-    fly -t my-rpi set-pipeline -n -p test-${task}-task -c external-tasks/${task}/example/pipe.yaml && \
+    fly -t my-rpi set-pipeline -n -p test-${task}-task -c external-tasks/${task}/example/pipe.yaml
     fly -t my-rpi unpause-pipeline -p test-${task}-task
     fly -t my-rpi trigger-job --job test-${task}-task/test-job
 done
 ~~~
 
-Use the web console to verify the output of the tests.
+Use the web console to verify the status of the tests.
 
 ## BIY
 
