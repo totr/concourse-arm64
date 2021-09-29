@@ -38,7 +38,7 @@ jobs:
           args:
             - -exc
             - |
-              ./code/ci-images/dcind/example/unit-tests.sh
+              ./code/build-tasks/dcind/example/unit-tests.sh
 
   - name: integration
     plan:
@@ -57,7 +57,7 @@ jobs:
           image_resource:
             type: registry-image
             source:
-              repository: rdclda/concourse-dcind
+              repository: rdclda/concourse-dcind-task
           inputs:
             - name: code
             - name: redis
@@ -81,4 +81,4 @@ jobs:
                 docker images
                 
                 # Run the container with tests and its dependencies.
-                docker-compose -f code/ci-images/dcind/example/integration.yaml run tests
+                docker-compose -f code/build-tasks/dcind/example/integration.yaml run tests

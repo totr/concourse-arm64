@@ -18,9 +18,9 @@ To ensure Docker doesn't try to fetch the images itself you can use docker load 
 
 ### Usage
 
-Use this `Dockerfile` to build a base image for your integration tests in [Concourse CI](http://concourse.ci/). Alternatively, you can use a ready-to-use image from the Docker Hub: [rdclda/concourse-dcind](https://hub.docker.com/rdclda/concourse-dcind). The image is Alpine based.
+Use this `Dockerfile` to build a base image for your integration tests in [Concourse CI](http://concourse.ci/). Alternatively, you can use a ready-to-use image from the Docker Hub: [rdclda/concourse-dcind-task](https://hub.docker.com/rdclda/concourse-dcind-task). The image is Alpine based.
 
-Here is an example of a Concourse [job](https://concourse-ci.org/jobs.html) that uses `rdclda/concourse-dcind` image to run a bunch of containers in a task, and then runs the integration test suite. You can find a full version of this example in the [`example`](./example) directory.
+Here is an example of a Concourse [job](https://concourse-ci.org/jobs.html) that uses `rdclda/concourse-dcind-task` image to run a bunch of containers in a task, and then runs the integration test suite. You can find a full version of this example in the [`example`](./example) directory.
 
 Note that `docker-lib.sh` has `bash` dependencies, so it is important to use `bash` in your task.
 
@@ -42,7 +42,7 @@ Note that `docker-lib.sh` has `bash` dependencies, so it is important to use `ba
           image_resource:
             type: registry-image
             source:
-              repository: rdclda/concourse-dcind
+              repository: rdclda/concourse-dcind-task
           inputs:
             - name: code
             - name: redis
@@ -65,5 +65,5 @@ Note that `docker-lib.sh` has `bash` dependencies, so it is important to use `ba
                 docker images
                 
                 # Run the container with tests and its dependencies.
-                docker-compose -f code/ci-images/dcind/example/integration.yaml run tests
+                docker-compose -f code/build-tasks/dcind/example/integration.yaml run tests
 ~~~

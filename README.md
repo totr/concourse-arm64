@@ -52,7 +52,7 @@ $ for resource in registry-image time git s3; do
 done
 
 # deploy & kick off the Docker Compose in Docker (dcind) test
-$ fly -t my-rpi set-pipeline -n -p test-dcind -c ci-images/dcind/example/pipe.yaml && \
+$ fly -t my-rpi set-pipeline -n -p test-dcind -c build-tasks/dcind/example/pipe.yaml && \
     fly -t my-rpi unpause-pipeline -p test-dcind
     fly -t my-rpi trigger-job --job test-dcind/unit-tests  
 ~~~
