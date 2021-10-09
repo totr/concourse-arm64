@@ -11,7 +11,8 @@ This repository helps you build both the web and worker `arm64` components for C
 | v7.1.0 | v1.12.0 | v1.5.2 | v1.2.0 | v1.3.0 | v1.5.0 | v0.11.1 | v1.1.1 | v0.15.0 |
 | v7.2.0 | v1.12.1 | v1.5.2 | v1.2.1 | v1.3.0 | v1.6.0 | v0.11.1 | v1.1.1 | v0.15.0 |
 | v7.3.2 | v1.14.0 | v1.6.1 | v1.3.0 | v1.3.1 | v1.6.0 | v0.11.2 | v1.1.1 | v0.15.0 |
-| v7.4.0 | v1.14.0 | v1.6.4 | v1.4.0 | v1.3.4 | v1.6.1 | v0.12.2 | v1.1.2 | v0.15.0 |
+| v7.4.0 | v1.14.0 | v1.6.2 | v1.4.0 | v1.3.4 | v1.6.1 | v0.12.2 | v1.1.2 | v0.15.0 |
+| v7.4.1 | v1.14.0 | v1.6.4 | v1.4.0 | v1.3.4 | v1.6.1 | v0.12.2 | v1.1.2 | v0.15.0 |
 | v7.5.0 | v1.14.4 | v1.6.4 | v1.4.1 | v1.3.4 | v1.6.2 | v0.12.3 | v1.1.3 | v0.15.0 |
 
 ## Bundled CLIs
@@ -36,7 +37,8 @@ Copy the example [docker-compose.yaml](./docker-compose.yaml) to your Raspberry 
 $ sudo docker-compose up
 
 # Login using fly - update your IP here too ;-)
-$ fly --target=my-rpi login \
+$ export FLY_TARGET=my-rpi
+$ fly --target=$FLY_TARGET login \
     --concourse-url=http://10.0.19.18:8080 \
     --username=test \
     --password=test                                                      
@@ -69,19 +71,19 @@ Now, we can deploy and run the tests:
 
 ~~~bash
 # deploy & kick off the bundled resource tests
-$ for resource in registry-image time git s3 slack-alert; do
-    fly -t my-rpi set-pipeline -n -p test-${resource}-resource -c tests/$resource-resource.yaml \
+$ for resource in registry-image time git s3 mock slack-alert; do
+    fly -t $FLY_TARGET set-pipeline -n -p test-${resource}-resource -c tests/$resource-resource.yaml \
       --var s3-bucket-name=$S3_BUCKET_NAME \
       --var slack-webhook-url=$SLACK_WEBHOOK_URL
-    fly -t my-rpi unpause-pipeline -p test-${resource}-resource
-    fly -t my-rpi trigger-job --job test-${resource}-resource/test-job
+    fly -t $FLY_TARGET unpause-pipeline -p test-${resource}-resource
+    fly -t $FLY_TARGET trigger-job --job test-${resource}-resource/test-job
 done
 
 # deploy & kick off the external task test
 $ for task in dcind oci-build; do
-    fly -t my-rpi set-pipeline -n -p test-${task}-task -c external-tasks/${task}/example/pipe.yaml
-    fly -t my-rpi unpause-pipeline -p test-${task}-task
-    fly -t my-rpi trigger-job --job test-${task}-task/test-job
+    fly -t $FLY_TARGET set-pipeline -n -p test-${task}-task -c external-tasks/${task}/example/pipe.yaml
+    fly -t $FLY_TARGET unpause-pipeline -p test-${task}-task
+    fly -t $FLY_TARGET trigger-job --job test-${task}-task/test-job
 done
 ~~~
 
