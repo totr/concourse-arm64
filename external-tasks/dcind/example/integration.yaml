@@ -1,13 +1,19 @@
-version: "2"
+version: "3.9"
 
 services:
   myredis:
     image: arm64v8/redis:5-alpine
     container_name: myredis
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   tests:
     image: arm64v8/redis:5-alpine
     container_name: mytests
     depends_on:
-      - myredis
+      myredis:
+        condition: service_healthy
     command: "redis-cli -h myredis ping"
