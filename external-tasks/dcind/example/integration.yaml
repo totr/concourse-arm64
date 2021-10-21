@@ -16,4 +16,4 @@ services:
     depends_on:
       - myredis
         # condition: service_healthy
-    command: "sleep 10 && redis-cli -h myredis ping"
+    command: "sleep 10; redis-cli -h myredis ping"
