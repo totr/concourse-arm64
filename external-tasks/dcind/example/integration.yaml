@@ -14,6 +14,6 @@ services:
     image: arm64v8/redis:5-alpine
     container_name: mytests
     depends_on:
-      myredis:
-        condition: service_healthy
-    command: "redis-cli -h myredis ping"
+      - myredis
+        # condition: service_healthy
+    command: "sleep 10 && redis-cli -h myredis ping"
