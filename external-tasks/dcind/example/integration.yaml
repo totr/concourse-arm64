@@ -15,5 +15,6 @@ services:
     container_name: mytests
     depends_on:
       - myredis
-        # condition: service_healthy
-    command: "sleep 10; redis-cli -h myredis ping"
+      # myredis:
+      #   condition: service_healthy
+    command: bash -c "sleep 30 && redis-cli -h myredis ping"
