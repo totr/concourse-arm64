@@ -64,6 +64,7 @@ buildConcourseResourceDocker mock $MOCK_RESOURCE_VERSION false
 buildConcourseResourceDocker s3 $S3_RESOURCE_VERSION false
 buildConcourseResourceDocker github-release $GITHUB_RELEASE_RESOURCE_VERSION false
 buildConcourseResourceDocker slack-alert $SLACK_ALERT_RESOURCE_VERSION false
+buildConcourseResourceDocker docker-image $DOCKER_IMAGE_RESOURCE_VERSION false
 
 #
 # Concourse image build
