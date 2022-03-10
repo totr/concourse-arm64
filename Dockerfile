@@ -1,3 +1,6 @@
+# Global build images
+ARG golang_concourse_builder_image
+
 #
 # Build the UI artefacts
 FROM ubuntu:20.04 AS yarn-builder
@@ -38,7 +41,7 @@ RUN yarn build
 
 #
 # Build the go artefacts
-FROM golang:1.16.2-alpine3.13 AS go-builder
+FROM ${golang_concourse_builder_image} AS go-builder
 
 ENV GO111MODULE=on
 

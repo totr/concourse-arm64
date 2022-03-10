@@ -74,6 +74,7 @@ docker buildx build \
   --build-arg concourse_docker_entrypoint_commit_id=$CONCOURSE_DOCKER_ENTRYPOINT_COMMIT_ID \
   --build-arg elm_version=$ELM_TARBALL_VERSION \
   --build-arg node_version=$NODE_VERSION \
+  --build-arg golang_concourse_builder_image=$GOLANG_CONCOURSE_BUILDER_IMAGE \
   --platform linux/arm64 \
   --tag $DOCKER_REGISTRY_BASE/concourse:$CONCOURSE_VERSION \
   --push .

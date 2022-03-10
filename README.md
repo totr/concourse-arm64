@@ -18,6 +18,7 @@ This repository helps you build both the web and worker `arm64` components for C
 | v7.4.4 | v1.14.0 | v1.6.4 | v1.4.0 | v1.3.4 | v1.6.1 | v0.12.2 | v1.1.2 | v0.15.0 |
 | v7.5.0 | v1.14.4 | v1.6.4 | v1.4.1 | v1.3.4 | v1.6.2 | v0.12.3 | v1.1.3 | v0.15.0 |
 | v7.6.0 | v1.14.5 | v1.6.4 | v1.4.1 | v1.3.4 | v1.6.2 | v0.12.3 | v1.1.3 | v0.15.0 |
+| v7.7.0 | v1.14.5 | v1.6.4 | v1.5.0 | v1.3.4 | v1.6.3 | v0.12.3 | v1.2.0 | v0.15.0 |
 
 ## Bundled CLIs
 
@@ -146,7 +147,7 @@ You will find under the `./build-specs` directory the available configurations f
 
 ~~~bash
 # Kick off the build - specify the concourse version you want to build
-./build.sh 7.1.0
+./build.sh 7.7.0
 ~~~
 
 The generated Docker image will be pushed to the specified repository defined in the `.env` file.
