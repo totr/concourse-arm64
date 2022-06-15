@@ -21,6 +21,7 @@ This repository helps you build both the web and worker `arm64` components for C
 | v7.7.0 | v1.14.5 | v1.6.4 | v1.5.0 | v1.3.4 | v1.6.3 | v0.12.3 | v1.2.0 | v0.15.0 |
 | v7.7.1 | v1.14.5 | v1.6.4 | v1.5.0 | v1.3.4 | v1.6.3 | v0.12.3 | v1.2.0 | v0.15.0 |
 | v7.8.0 | v1.14.5 | v1.7.1 | v1.5.1 | v1.4.0 | v1.6.3 | v0.12.4 | v1.2.1 | v0.15.0 |
+| v7.8.1 | v1.14.5 | v1.7.2 | v1.5.1 | v1.4.0 | v1.6.3 | v0.12.4 | v1.2.1 | v0.15.0 |
 
 ## Bundled CLIs
 
