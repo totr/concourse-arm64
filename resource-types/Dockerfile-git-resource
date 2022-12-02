@@ -38,6 +38,7 @@ WORKDIR /root/git-resource
 RUN mkdir -p /opt/resource && cp ./assets/* /opt/resource/
 RUN chmod +x /opt/resource/*
 
+ENV CXXFLAGS -DOPENSSL_API_COMPAT=0x30000000L
 WORKDIR /root/git-resource/scripts
 RUN ./install_git_crypt.sh
 
