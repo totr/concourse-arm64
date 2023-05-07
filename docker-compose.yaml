@@ -10,7 +10,7 @@ services:
       PGDATA: /database
 
   concourse:
-    image: rdclda/concourse:7.5.0
+    image: rdclda/concourse:7.9.0
     command: quickstart
     privileged: true
     depends_on: [concourse-db]
@@ -21,7 +21,7 @@ services:
       CONCOURSE_POSTGRES_PASSWORD: concourse_pass
       CONCOURSE_POSTGRES_DATABASE: concourse
       # replace this with your external IP address
-      CONCOURSE_EXTERNAL_URL: http://10.0.19.18:8080
+      CONCOURSE_EXTERNAL_URL: http://concourse.localtest.me:8080
       CONCOURSE_ADD_LOCAL_USER: test:test
       CONCOURSE_MAIN_TEAM_LOCAL_USER: test
       # instead of relying on the default "detect"

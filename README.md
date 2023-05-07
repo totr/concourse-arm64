@@ -153,7 +153,11 @@ You will find under the `./build-specs` directory the available configurations f
 
 ~~~bash
 # Kick off the build - specify the concourse version you want to build
+# Using Intel / Docker Compose:
 ./build.sh 7.9.0
+
+# Using ARM62 (M1, M2) and podman:
+./build_podman_arm64.sh 7.9.0
 ~~~
 
 The generated Docker image will be pushed to the specified repository defined in the `.env` file.
