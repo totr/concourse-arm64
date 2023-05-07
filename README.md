@@ -25,6 +25,7 @@ This repository helps you build both the web and worker `arm64` components for C
 | v7.8.2 | v1.14.5 | v1.7.2 | v1.5.1 | v1.4.0 | v1.6.3 | v0.12.4 | v1.2.1 | v0.15.0 |
 | v7.8.3 | v1.14.5 | v1.7.2 | v1.5.1 | v1.4.0 | v1.6.3 | v0.12.4 | v1.2.1 | v0.15.0 |
 | v7.9.0 | v1.14.6 | v1.8.0 | v1.7.0 | v1.5.0 | v1.6.3 | v0.12.4 | v1.2.1 | v0.15.0 |
+| v7.9.1 | v1.14.7 | v1.8.0 | v1.7.1 | v1.5.1 | v1.6.3 | v0.12.4 | v1.2.1 | v0.15.0 |
 
 ## Bundled CLIs
 
@@ -44,18 +45,18 @@ The following tasks have been ported to the `arm64` platform:
 Copy the example [docker-compose.yaml](./docker-compose.yaml) to your Raspberry Pi and update the external IP address setting `CONCOURSE_EXTERNAL_URL`.
 
 ~~~bash
-# On your Raspberry Pi node
-$ sudo docker-compose up
+# On your Macbook M1/M2 machine
+$ podman-compose up -d
 
 # Login using fly - update your IP here too ;-)
-$ export FLY_TARGET=my-rpi
+$ export FLY_TARGET=my-m2
 $ fly --target=$FLY_TARGET login \
-    --concourse-url=http://10.0.19.18:8080 \
+    --concourse-url=http://concourse.localtest.me:8080 \
     --username=test \
     --password=test                                                      
 ~~~
 
-You can now access the Concourse web console using [http://10.0.19.18:8080/](http://10.0.19.18:8080/).
+You can now access the Concourse web console using [http://concourse.localtest.me:8080/](http://concourse.localtest.me:8080/).
 
 ## Tests
 
@@ -154,10 +155,10 @@ You will find under the `./build-specs` directory the available configurations f
 ~~~bash
 # Kick off the build - specify the concourse version you want to build
 # Using Intel / Docker Compose:
-./build.sh 7.9.0
+./build.sh 7.9.1
 
-# Using ARM62 (M1, M2) and podman:
-./build_podman_arm64.sh 7.9.0
+# Using ARM64 (M1, M2) and podman:
+./build_podman_arm64.sh 7.9.1
 ~~~
 
 The generated Docker image will be pushed to the specified repository defined in the `.env` file.
